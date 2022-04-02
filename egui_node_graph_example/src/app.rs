@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use eframe::{
-    egui::{self, DragValue},
+    egui::{self, DragValue, TextStyle},
     epi,
 };
 use egui_node_graph::*;
@@ -359,11 +359,12 @@ impl epi::App for NodeGraphExample {
 
     /// Called each time the UI needs repainting, which may be many times per second.
     /// Put your widgets into a `SidePanel`, `TopPanel`, `CentralPanel`, `Window` or `Area`.
-    fn update(&mut self, ctx: &egui::CtxRef, _frame: &epi::Frame) {
+    fn update(&mut self, ctx: &egui::Context, _frame: &epi::Frame) {
         let graph_response =
             egui::CentralPanel::default().show(&ctx, |ui| {
                 self.state.draw_graph_editor(ctx, ui,  AllMyNodeTemplates)
             }).inner;
+
         for node_response in graph_response.node_responses {
             // Here, we ignore all other graph events. But you may find
             // some use for them. For example, by playing a sound when a new
@@ -387,7 +388,7 @@ impl epi::App for NodeGraphExample {
                 egui::pos2(10.0, 10.0),
                 egui::Align2::LEFT_TOP,
                 text,
-                egui::TextStyle::Button,
+                TextStyle::Button.resolve(&ctx.style()),
                 egui::Color32::WHITE,
             );
         }
