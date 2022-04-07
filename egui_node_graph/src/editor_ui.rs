@@ -19,7 +19,7 @@ pub enum NodeResponse<UserResponse: UserResponseTrait> {
     CreatedNode(NodeId),
     SelectNode(NodeId),
     DeleteNode(NodeId),
-    DisconnectEvent(InputId),
+    DisconnectEvent{ output: OutputId, input: InputId },
     /// Emitted when a node is interacted with, and should be raised
     RaiseNode(NodeId),
     User(UserResponse),
@@ -191,15 +191,11 @@ where
                     }
                     self.node_order.retain(|id| *id != node_id);
                 }
-                NodeResponse::DisconnectEvent(input_id) => {
-                    let corresp_output = self
-                        .graph
-                        .connection(input_id)
-                        .expect("Connection data should be valid");
-                    let other_node = self.graph.get_input(input_id).node();
-                    self.graph.remove_connection(input_id);
+                NodeResponse::DisconnectEvent{ input, output } => {
+                    let other_node = self.graph.get_input(input).node();
+                    self.graph.remove_connection(input);
                     self.connection_in_progress =
-                        Some((other_node, AnyParameterId::Output(corresp_output)));
+                        Some((other_node, AnyParameterId::Output(output)));
                 }
                 NodeResponse::RaiseNode(node_id) => {
                     let old_pos = self
@@ -363,7 +359,7 @@ where
             param_id: AnyParameterId,
             port_locations: &mut PortLocations,
             ongoing_drag: Option<(NodeId, AnyParameterId)>,
-            is_connected_input: bool,
+            connected_to_output: Option<OutputId>,
         ) where
             DataType: DataTypeTrait,
             UserResponse: UserResponseTrait,
@@ -388,8 +384,11 @@ where
                 .circle(port_rect.center(), 5.0, port_color, Stroke::none());
 
             if resp.drag_started() {
-                if is_connected_input {
-                    responses.push(NodeResponse::DisconnectEvent(param_id.assume_input()));
+                if let Some(output) = connected_to_output {
+                    responses.push(NodeResponse::DisconnectEvent {
+                        output,
+                        input: param_id.assume_input(),
+                    });
                 } else {
                     responses.push(NodeResponse::ConnectEventStarted(node_id, param_id));
                 }
@@ -436,7 +435,7 @@ where
                     AnyParameterId::Input(*param),
                     self.port_locations,
                     self.ongoing_drag,
-                    self.graph.connection(*param).is_some(),
+                    self.graph.connection(*param),
                 );
             }
         }
@@ -457,7 +456,7 @@ where
                 AnyParameterId::Output(*param),
                 self.port_locations,
                 self.ongoing_drag,
-                false,
+                None,
             );
         }
 
