@@ -65,6 +65,13 @@ where DataType: DataTypeTrait {
         output_id
     }
 
+    pub fn remove_output_param(&mut self, output_id: OutputId) {
+        self.remove_outgoing_connections(output_id);
+        let node_id = self.get_output(output_id).node;
+        self.nodes[node_id].outputs.retain(|&(_, id)| id != output_id);
+        self.outputs.remove(output_id);
+    }
+
     pub fn remove_node(&mut self, node_id: NodeId) {
         let inputs: SVec<_> = self[node_id].input_ids().collect();
         for input in inputs {

@@ -84,6 +84,18 @@ where
         // Used to detect when the background was clicked, to dismiss certain selfs
         let mut click_on_background = false;
 
+        // If the port we are connecting from was deleted, cancel the attempt
+        if let Some((_, port)) = self.connection_in_progress {
+            let exists = match port {
+                AnyParameterId::Input(input) => self.graph.inputs.contains_key(input),
+                AnyParameterId::Output(output) => self.graph.outputs.contains_key(output),
+            };
+
+            if !exists {
+                self.connection_in_progress = None;
+            }
+        }
+
         debug_assert_eq!(
             self.node_order.iter().copied().collect::<HashSet<_>>(),
             self.graph.iter_nodes().collect::<HashSet<_>>(),
