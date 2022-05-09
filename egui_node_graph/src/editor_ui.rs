@@ -70,8 +70,7 @@ where
         let editor_rect = ui.max_rect();
         ui.allocate_rect(editor_rect, Sense::hover());
 
-        let mouse = &ctx.input().pointer;
-        let cursor_pos = mouse.hover_pos().unwrap_or(Pos2::ZERO);
+        let cursor_pos = ctx.input().pointer.hover_pos().unwrap_or(Pos2::ZERO);
         let mut cursor_in_editor = editor_rect.contains(cursor_pos);
 
         // Gets filled with the port locations as nodes are drawn
@@ -225,6 +224,9 @@ where
         }
 
         /* Mouse input handling */
+
+        // This locks the context, so don't hold on to it for too long.
+        let mouse = &ctx.input().pointer;
 
         if mouse.any_released() && self.connection_in_progress.is_some() {
             self.connection_in_progress = None;
