@@ -114,7 +114,7 @@ where
                     .selected_node
                     .map(|selected| selected == node_id)
                     .unwrap_or(false),
-                pan: self.pan_zoom.pan,
+                pan: self.pan_zoom.pan + editor_rect.min.to_vec2(),
             }
                 .show(ui, &self.user_state);
 
@@ -141,8 +141,10 @@ where
                         node_kind.user_data(),
                         |graph, node_id| node_kind.build_node(graph, node_id),
                     );
-                    self.node_positions
-                        .insert(new_node, cursor_pos - self.pan_zoom.pan);
+                    self.node_positions.insert(
+                        new_node, 
+                        cursor_pos - self.pan_zoom.pan - editor_rect.min.to_vec2()
+                    );
                     self.node_order.push(new_node);
 
                     should_close_node_finder = true;
