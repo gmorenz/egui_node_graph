@@ -84,7 +84,7 @@ where DataType: DataTypeTrait {
         self.nodes.remove(node_id);
     }
 
-    pub fn remove_connection(&mut self, input_id: InputId, output_id: OutputId) {
+    pub fn remove_connection(&mut self, output_id: OutputId, input_id: InputId) {
         self.outgoing[output_id].retain(|&mut x| x != input_id);
         self.incoming[input_id].retain(|&mut x| x != output_id);
     }

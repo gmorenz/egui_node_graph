@@ -142,7 +142,7 @@ where
                         |graph, node_id| node_kind.build_node(graph, node_id),
                     );
                     self.node_positions.insert(
-                        new_node, 
+                        new_node,
                         cursor_pos - self.pan_zoom.pan - editor_rect.min.to_vec2()
                     );
                     self.node_order.push(new_node);
@@ -206,7 +206,7 @@ where
                 }
                 NodeResponse::DisconnectEvent{ input, output } => {
                     let other_node = self.graph.get_input(input).node();
-                    self.graph.remove_connection(input, output);
+                    self.graph.remove_connection(output, input);
                     self.connection_in_progress =
                         Some((other_node, AnyParameterId::Output(output)));
                 }
