@@ -173,7 +173,7 @@ where
             ui.painter().line_segment([start_pos, cursor_pos], connection_stroke)
         }
 
-        for (input, output) in self.graph.iter_connections() {
+        for (output, input) in self.graph.iter_connections() {
             let src_pos = port_locations[&AnyParameterId::Output(output)];
             let dst_pos = port_locations[&AnyParameterId::Input(input)];
             ui.painter().line_segment([src_pos, dst_pos], connection_stroke);

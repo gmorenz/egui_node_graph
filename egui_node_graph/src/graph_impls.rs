@@ -137,9 +137,9 @@ where DataType: DataTypeTrait {
         }
     }
 
-    pub fn iter_connections(&self) -> impl Iterator<Item = (InputId, OutputId)> + '_ {
-        self.incoming.iter().flat_map(|(o, inputs)|
-            inputs.iter().map(move |&i| (o, i))
+    pub fn iter_connections(&self) -> impl Iterator<Item = (OutputId, InputId)> + '_ {
+        self.incoming.iter().flat_map(|(i, outputs)|
+            outputs.iter().map(move |&o| (o, i))
         )
     }
 
